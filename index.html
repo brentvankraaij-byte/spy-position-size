@@ -255,11 +255,11 @@ hr{
         <div class="suffix">%</div>
     </div>
 
-    <label>Stop (TradingView Pips)</label>
+    <label>Stop Distance (US500 Points)</label>
     <div class="box">
         <input id="stop" type="text" inputmode="decimal" autocomplete="off">
     </div>
-    <div class="note">For US500: 100 TradingView pips = 1.00 index point.</div>
+    <div class="note">Enter the stop distance shown by TradingView. Example: Stop 5 = enter 5</div>
 
     <div class="result">
 
@@ -510,7 +510,7 @@ function calculate(){
     /* Stop distance in actual US500 points */
 
     const stopDistancePoints =
-        stopPips / 100;
+        stopPips;
 
 
     /*
