@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SPY Position Size Calculator</title>
 
-<link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon-v2.png">
 
 <style>
 body{
@@ -98,35 +98,57 @@ Volume:<br>
 
 <script>
 
+function formatThousands(value){
+    value = value.replace(/\D/g,'');
+
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+}
+
+function parseNumber(value){
+    return parseFloat(value.replace(/\./g,'')) || 0;
+}
+
+document.getElementById("balance").addEventListener("input", function(){
+
+    const cursor = this.selectionStart;
+
+    this.value = formatThousands(this.value);
+
+    calculate();
+
+});
+
+document.getElementById("risk").addEventListener("input", calculate);
+document.getElementById("stop").addEventListener("input", calculate);
+
 function calculate(){
 
-    const balance = parseFloat(document.getElementById("balance").value) || 0;
+    const balance = parseNumber(document.getElementById("balance").value);
+
     const riskPercent = parseFloat(document.getElementById("risk").value) || 0;
+
     const stopPips = parseFloat(document.getElementById("stop").value) || 0;
 
     if(stopPips <= 0){
+
         document.getElementById("riskAmount").innerText = "0.00";
         document.getElementById("volume").innerText = "0.00";
+
         return;
+
     }
 
-    // Money you want to risk
     const riskAmount = balance * riskPercent / 100;
 
-    // TradingView "50 pips" = $0.50
     const stopDistance = stopPips / 100;
 
-    // SPY CFD (Contract Size = 1)
     const volume = riskAmount / stopDistance;
 
     document.getElementById("riskAmount").innerText = riskAmount.toFixed(2);
+
     document.getElementById("volume").innerText = volume.toFixed(2);
 
 }
-
-document.querySelectorAll("input").forEach(input=>{
-    input.addEventListener("input", calculate);
-});
 
 calculate();
 
