@@ -1,194 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SPY Position Size Calculator</title>
+    <meta charset="UTF-8">
 
-<link rel="apple-touch-icon" href="icon-v2.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-    margin:0;
-    font-family:Arial, Helvetica, sans-serif;
-    background:#1e1e1e;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Risk Calculator">
 
-.container{
-    width:350px;
-    background:#2b2b2b;
-    padding:25px;
-    border-radius:12px;
-    box-shadow:0 0 20px rgba(0,0,0,.4);
-}
+    <link rel="apple-touch-icon" href="icon-v2.png">
 
-h2{
-    text-align:center;
-    margin-bottom:20px;
-}
+    <title>Risk Calculator V4</title>
 
-label{
-    display:block;
-    margin-top:15px;
-    margin-bottom:5px;
-}
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --card: #2b2b2b;
+            --input: #444;
+            --result: #222;
+            --blue: #4b82e8;
+            --text: #fff;
+            --muted: #bdbdbd;
+        }
 
-input{
-    width:100%;
-    padding:10px;
-    font-size:16px;
-    border:none;
-    border-radius:6px;
-    background:#3a3a3a;
-    color:white;
-    box-sizing:border-box;
-}
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
-.result{
-    margin-top:25px;
-    background:#202020;
-    padding:15px;
-    border-radius:8px;
-    text-align:center;
-    font-size:18px;
-    line-height:1.7;
-}
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-.volume{
-    font-size:34px;
-    font-weight:bold;
-    color:#4CAF50;
-}
-</style>
+        .card {
+            width: 380px;
+            max-width: 100%;
+            background: var(--card);
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0 0 28px;
+            font-size: 42px;
+        }
+
+        h3 {
+            margin: 0 0 10px;
+            color: var(--muted);
+        }
+
+        .switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .switch button {
+            border: none;
+            border-radius: 14px;
+            background: #4a4a4a;
+            color: #fff;
+            padding: 16px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .switch button.active {
+            background: var(--blue);
+        }
+
+        label {
+            display: block;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 22px 0 8px;
+        }
+
+        .box {
+            display: flex;
+            align-items: center;
+            background: var(--input);
+            border-radius: 14px;
+            padding: 0 18px;
+        }
+
+        .symbol {
+            font-size: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 30px;
+            padding: 18px 0;
+            outline: none;
+        }
+
+        /* Remove arrows from number inputs */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .result {
+            margin-top: 28px;
+            background: var(--result);
+            border-radius: 18px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .small {
+            font-size: 22px;
+            color: #cfcfcf;
+        }
+
+        .money {
+            font-size: 46px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #4b4b4b;
+            margin: 24px 0;
+        }
+
+        .volume {
+            font-size: 72px;
+            font-weight: bold;
+            color: var(--blue);
+            line-height: 1;
+        }
+
+        .lots {
+            font-size: 30px;
+            color: #cfcfcf;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="card">
 
-<h2>SPY Position Size</h2>
+        <h1>Risk Calculator</h1>
 
-<label>Account Balance (€)</label>
-<input id="balance" type="text" value="1.000" inputmode="numeric">
+        <h3>Currency</h3>
+
+        <div class="switch">
+            <button id="eur" class="active">€ EUR</button>
+            <button id="usd">$ USD</button>
+        </div>
+
+        <label>Account Balance</label>
+
+<div class="box">
+    <div id="sym" class="symbol">€</div>
+    <input
+        id="balance"
+        type="text"
+        inputmode="numeric"
+        autocomplete="off"
+    >
+</div>
+
+<label>Exchange Rate</label>
+
+<div class="box">
+    <input
+        id="exchangeRate"
+        type="number"
+        step="0.0001"
+        inputmode="decimal"
+        placeholder="EUR/USD exchange rate"
+    >
+</div>
 
 <label>Risk (%)</label>
-<input id="risk" type="number" step="0.1" value="1">
 
-<label>Stop (TradingView Pips)</label>
-<input id="stop" type="number" value="50">
-
-<div class="result">
-Risk Amount:<br>
-<b>€<span id="riskAmount">10.00</span></b>
-
-<br><br>
-
-Volume:<br>
-<div class="volume">
-<span id="volume">20.00</span> Lots
-</div>
+<div class="box">
+    <input
+        id="risk"
+        type="number"
+        step="0.1"
+        inputmode="decimal"
+    >
 </div>
 
-</div>
+        <label>Stop (TradingView Pips)</label>
 
-<script>
+        <div class="box">
+            <input
+                id="stop"
+                type="number"
+                inputmode="decimal"
+            >
+        </div>
 
-// ---------- FORMAT FUNCTIONS ----------
+        <div class="result">
 
-function formatBalance(value){
+            <div class="small">Risk</div>
+            <div id="riskAmount" class="money">€10,00</div>
 
-    // Keep only digits
-    value = value.replace(/\D/g,'');
+            <hr>
 
-    if(value === '') return '';
+            <div class="small">Volume</div>
+            <div id="volume" class="volume">20.00</div>
+            <div class="lots">Lots</div>
 
-    // Add thousand separators
-    return Number(value).toLocaleString('nl-NL');
+        </div>
 
+    </div>
+
+
+    <script>
+
+        let currency = localStorage.getItem("currency") || "EUR";
+
+        const balance = document.getElementById("balance");
+        const risk = document.getElementById("risk");
+        const stop = document.getElementById("stop");
+        const exchangeRate = document.getElementById("exchangeRate");
+
+
+        function locale() {
+            return currency === "EUR" ? "nl-NL" : "en-US";
+        }
+
+
+        function symbol() {
+            return currency === "EUR" ? "€" : "$";
+        }
+
+
+        function balanceKey() {
+            return currency === "EUR"
+                ? "balance_eur"
+                : "balance_usd";
+        }
+
+
+        function format(n) {
+            return new Intl.NumberFormat(locale(), {
+                maximumFractionDigits: 0
+            }).format(Number(n) || 0);
+        }
+
+
+        function parse(v) {
+            return Number(
+                String(v).replace(/[^0-9]/g, "")
+            ) || 0;
+        }
+
+
+        function money(v) {
+            return new Intl.NumberFormat(locale(), {
+                style: "currency",
+                currency: currency,
+                minimumFractionDigits: 2
+            }).format(v);
+        }
+
+
+        function updateUI() {
+
+            document.getElementById("sym").textContent = symbol();
+
+            document
+                .getElementById("eur")
+                .classList.toggle(
+                    "active",
+                    currency === "EUR"
+                );
+
+            document
+                .getElementById("usd")
+                .classList.toggle(
+                    "active",
+                    currency === "USD"
+                );
+
+            const saved =
+                localStorage.getItem(balanceKey()) || 1000;
+
+            balance.value = format(saved);
+
+            calculate();
+        }
+
+
+        function calculate() {
+
+            const bal = parse(balance.value);
+            const r = Number(risk.value) || 0;
+            const s = Number(stop.value) || 0;
+
+
+            // Save settings
+
+            localStorage.setItem(
+                balanceKey(),
+                bal
+            );
+
+            localStorage.setItem(
+                "risk",
+                risk.value
+            );
+
+            localStorage.setItem(
+                "stop",
+                stop.value
+            );
+            
+
+            localStorage.setItem(
+                "currency",
+                currency
+            );
+            localStorage.setItem(
+            "exchangeRate",
+            exchangeRate.value
+            );
+
+            // Format balance
+
+            balance.value = bal
+                ? format(bal)
+                : "";
+
+
+            // Calculate risk amount
+
+let usdRiskAmount = riskAmt;
+
+if (currency === "EUR") {
+
+    const rate =
+        Number(exchangeRate.value) || 0;
+
+    usdRiskAmount =
+        riskAmt * rate;
 }
 
-function getBalance(){
+const volume =
+    usdRiskAmount / (s / 100);
 
-    const text = document.getElementById("balance").value;
+            document.getElementById(
+                "riskAmount"
+            ).textContent = money(riskAmt);
 
-    return parseInt(text.replace(/\./g,'')) || 0;
 
-}
+            // Calculate volume
 
-// ---------- LOAD SAVED VALUES ----------
+            if (s <= 0) {
 
-window.onload = function(){
+                document.getElementById(
+                    "volume"
+                ).textContent = "0.00";
 
-    const savedBalance = localStorage.getItem("balance");
-    const savedRisk = localStorage.getItem("risk");
+                return;
+            }
 
-    if(savedBalance){
-        document.getElementById("balance").value = formatBalance(savedBalance);
-    }
 
-    if(savedRisk){
-        document.getElementById("risk").value = savedRisk;
-    }
+            const volume =
+                riskAmt / (s / 100);
 
-    calculate();
+            document.getElementById(
+                "volume"
+            ).textContent =
+                volume.toFixed(2);
+        }
 
-};
 
-// ---------- BALANCE INPUT ----------
+        // Event listeners
 
-document.getElementById("balance").addEventListener("input", function(){
+        balance.addEventListener(
+            "input",
+            () => {
 
-    const digits = this.value.replace(/\D/g,'');
+                balance.value =
+                    format(
+                        parse(balance.value)
+                    );
 
-    this.value = formatBalance(digits);
+                calculate();
+            }
+        );
 
-    calculate();
 
-});
+        risk.addEventListener(
+            "input",
+            calculate
+        );
 
-document.getElementById("risk").addEventListener("input", calculate);
-document.getElementById("stop").addEventListener("input", calculate);
 
-// ---------- CALCULATE ----------
+        stop.addEventListener(
+            "input",
+            calculate
+        );
 
-function calculate(){
 
-    const balance = getBalance();
+        stop.addEventListener(
+            "focus",
+            () => stop.select()
+        );
+        exchangeRate.addEventListener(
+            "input",
+            calculate
+        );
 
-    const riskPercent = parseFloat(document.getElementById("risk").value) || 0;
 
-    const stopPips = parseFloat(document.getElementById("stop").value) || 0;
+        // Currency buttons
 
-    // Save values
-    localStorage.setItem("balance", balance);
-    localStorage.setItem("risk", riskPercent);
+        document.getElementById(
+            "eur"
+        ).onclick = () => {
 
-    if(stopPips <= 0){
+            currency = "EUR";
 
-        document.getElementById("riskAmount").innerText = "0.00";
-        document.getElementById("volume").innerText = "0.00";
-        return;
+            updateUI();
+        };
 
-    }
 
-    const riskAmount = balance * riskPercent / 100;
+        document.getElementById(
+            "usd"
+        ).onclick = () => {
 
-    // TradingView:
-    // 50 pips = $0.50
-    const stopDistance = stopPips / 100;
+            currency = "USD";
 
-    const volume = riskAmount / stopDistance;
+            updateUI();
+        };
 
-    document.getElementById("riskAmount").innerText = riskAmount.toFixed(2);
-    document.getElementById("volume").innerText = volume.toFixed(2);
 
-}
+        // Load saved settings
 
-</script>
+        risk.value =
+            localStorage.getItem("risk") || 1;
+
+        stop.value =
+            localStorage.getItem("stop") || 50;
+        
+
+exchangeRate.value =
+
+    localStorage.getItem("exchangeRate") || "";
+
+
+        updateUI();
+
+    </script>
+
 </body>
 </html>
