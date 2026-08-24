@@ -278,6 +278,12 @@ hr{
         <div id="margin" class="margin">€0,00</div>
         <div id="marginPercent" class="margin-percent">0.00% of account balance</div>
 
+        <div id="marginLevel" class="margin-percent">
+            Margin Level: —
+        </div>
+
+        <div id="marginStatus" class="warning"></div>
+
         <div id="warning" class="warning"></div>
 
     </div>
@@ -308,6 +314,8 @@ const riskAmountDisplay = document.getElementById("riskAmount");
 const volumeDisplay = document.getElementById("volume");
 const marginDisplay = document.getElementById("margin");
 const marginPercentDisplay = document.getElementById("marginPercent");
+const marginLevelDisplay = document.getElementById("marginLevel");
+const marginStatus = document.getElementById("marginStatus");
 const warning = document.getElementById("warning");
 
 
@@ -597,6 +605,54 @@ const marginPercent =
 
 marginPercentDisplay.textContent =
     marginPercent.toFixed(2) + "% of account balance";
+
+
+/* =========================
+   MARGIN LEVEL
+========================= */
+
+const marginLevel =
+    marginInAccountCurrency > 0
+        ? (bal / marginInAccountCurrency) * 100
+        : 0;
+
+marginLevelDisplay.textContent =
+    "Margin Level: " + marginLevel.toFixed(2) + "%";
+
+
+/* =========================
+   MARGIN SAFETY STATUS
+========================= */
+
+if(marginLevel >= 150){
+
+    marginStatus.textContent =
+        "GOOD — Margin level above 150%";
+
+    marginStatus.style.color =
+        "#7fd39b";
+
+}
+
+else if(marginLevel >= 100){
+
+    marginStatus.textContent =
+        "CAUTION — Margin level between 100% and 150%";
+
+    marginStatus.style.color =
+        "#f0c75e";
+
+}
+
+else{
+
+    marginStatus.textContent =
+        "DANGER — Margin level below 100%";
+
+    marginStatus.style.color =
+        "#e57373";
+
+}
 
 }
 
