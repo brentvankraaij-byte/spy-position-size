@@ -278,11 +278,15 @@ hr{
         <div id="margin" class="margin">€0,00</div>
         <div id="marginPercent" class="margin-percent">0.00% of account balance</div>
 
-        <div id="marginLevel" class="margin-percent">
-            Margin Level: —
-        </div>
+<div id="marginLevel" class="margin-percent">
+    Margin Level: —
+</div>
 
-        <div id="marginStatus" class="warning"></div>
+<div id="marginLevelStop" class="margin-percent">
+    Margin Level at Stop: —
+</div>
+
+<div id="marginStatus" class="warning"></div>
 
         <div id="warning" class="warning"></div>
 
@@ -315,6 +319,7 @@ const volumeDisplay = document.getElementById("volume");
 const marginDisplay = document.getElementById("margin");
 const marginPercentDisplay = document.getElementById("marginPercent");
 const marginLevelDisplay = document.getElementById("marginLevel");
+const marginLevelStopDisplay = document.getElementById("marginLevelStop");
 const marginStatus = document.getElementById("marginStatus");
 const warning = document.getElementById("warning");
 
@@ -619,7 +624,21 @@ const marginLevel =
 marginLevelDisplay.textContent =
     "Margin Level: " + marginLevel.toFixed(2) + "%";
 
+/* =========================
+   MARGIN LEVEL AT STOP
+========================= */
+const equityAtStop =
+    bal - accountRiskAmount;
 
+const marginLevelAtStop =
+    marginInAccountCurrency > 0
+        ? (equityAtStop / marginInAccountCurrency) * 100
+        : 0;
+
+marginLevelStopDisplay.textContent =
+    "Margin Level at Stop: " +
+    marginLevelAtStop.toFixed(2) + "%";
+    
 /* =========================
    MARGIN SAFETY STATUS
 ========================= */
